@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "OpenFocus",
+  "short_name": "OpenFocus",
+  "version": "0.4.0",
+  "description": "Pause before you scroll. A free, open-source breathing pause for distracting sites, with schedules and focus blocks.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "favicon"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "src/dashboard/index.html"
+}

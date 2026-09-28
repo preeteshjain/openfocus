@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenFocus</title>
+    <link rel="icon" href="../../icons/icon32.png" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="logo" href="#/home"><img src="../../icons/icon48.png" alt="" />OpenFocus</a>
+        <nav class="nav" id="nav" aria-label="Main"></nav>
+        <div class="sidebar-foot">
+          <div id="status"></div>
+          <button class="help-link" id="help" type="button"></button>
+        </div>
+      </aside>
+      <main id="view"></main>
+    </div>
+    <script src="../content/overlay.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
