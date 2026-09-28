@@ -142,7 +142,7 @@ async function decide(href, tabId) {
 
   if (site.mode === "ask") {
     const askMax = site.askMaxMinutes;
-    if (!(siteExpired && siteAllow.ask)) {
+    if (!(tabExpired && tab.ask)) {
       const recent = last24(stats, site.id, now);
       return {
         ...base,
@@ -165,11 +165,13 @@ async function grantAllowance(siteId, tabId, minutes) {
   const now = Date.now();
   const reint = site.reintervention ? config.reinterventionMinutes * 60000 : 0;
 
+  // Time picked with "Ask me each time" is for this tab only. A new tab asks again, and the
+  // time ends when the tab closes.
   if (minutes) {
-    const allow = await getAllow();
-    allow[siteId] = { until: now + minutes * 60000, since: now, ask: true };
-    await chrome.storage.local.set({ allow });
-    return { recheckAt: allow[siteId].until };
+    const tabAllow = await getTabAllow();
+    tabAllow[tabId] = { siteId, until: now + minutes * 60000, since: now, ask: true };
+    await chrome.storage.session.set({ tabAllow });
+    return { recheckAt: tabAllow[tabId].until };
   }
   if (config.switching === "once") {
     const tabAllow = await getTabAllow();

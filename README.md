@@ -99,6 +99,7 @@ Every feature is free. You do not need an account, and your data stays on your c
 ### The pause
 
 - **No peeking:** The page stays hidden from the first moment, so the feed never flashes on screen. Videos and sound stay paused too.
+- **Stay for the pause:** The pause only runs while you look at the tab. Switch to another tab and it starts over when you come back.
 - **Rising Tide:** A calm green wave moves up and down the screen while you breathe.
 - **Breathing Orb:** A glowing circle grows and shrinks, and a ring shows how much time is left.
 - **Quiet Orb:** The same circle with no words or numbers on the screen.
@@ -112,7 +113,7 @@ Every feature is free. You do not need an account, and your data stays on your c
 
 - **Right away:** Pause every time you open the site.
 - **After a few minutes:** Use the site freely for a few minutes each hour. The pause comes after that.
-- **Ask me each time:** Slide to the number of minutes you want, then go in. The slider always starts at 1 minute.
+- **Ask me each time:** Slide to the number of minutes you want, then go in. The slider always starts at 1 minute. The time you pick is for that tab only. A new tab asks again.
 - **Pause length:** Make the pause anywhere from 3 to 60 seconds.
 - **Longer each try:** The pause grows by 2 seconds for each visit in the past 24 hours, up to 40 seconds more.
 - **Free time after the pause:** Choose how long a site stays open after you go in. Pick this visit only, or up to one hour.

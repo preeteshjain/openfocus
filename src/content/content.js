@@ -9,6 +9,7 @@
 
   let overlay = null;
   let current = null;
+  let counted = false;
   let dead = false;
   let checking = false;
   let pending = false;
@@ -55,17 +56,17 @@
   }
 
   const onPlay = (e) => {
-    if (overlay && e.target instanceof HTMLMediaElement) e.target.pause();
+    if (current && e.target instanceof HTMLMediaElement) e.target.pause();
   };
 
   // Key events are composed, so they would bubble out of the overlay to page shortcuts.
   // Stopping them here keeps default actions (typing, Tab, Enter on buttons) working.
   const keyGuard = (e) => {
-    if (overlay) e.stopImmediatePropagation();
+    if (current) e.stopImmediatePropagation();
   };
 
   const wheelGuard = (e) => {
-    if (overlay && e.target !== overlay.host) e.preventDefault();
+    if (current && e.target !== overlay?.host) e.preventDefault();
   };
 
   function guardOn() {
@@ -140,16 +141,17 @@
     return res.action === "block" || res.action === "limit";
   }
 
-  function showOverlay(res) {
-    removeOverlay();
-    hidePage();
-    guardOn();
-    current = res;
-    clearInterval(heartbeatTimer);
+  // A pause runs only while its tab is in view. A tab opened in the background waits for you,
+  // and a pause you leave halfway starts over when you come back. The try counts once.
+  function mountOverlay() {
+    const res = current;
+    if (!isHard(res) && document.visibilityState !== "visible") return;
+    const first = !counted;
+    counted = true;
     overlay = globalThis.OpenFocusOverlay.mount({
       data: res,
       token,
-      onShown: () => send({ type: "shown", siteId: res.siteId, hard: isHard(res) }),
+      onShown: first ? () => send({ type: "shown", siteId: res.siteId, hard: isHard(res) }) : null,
       onExit: () => send({ type: "exit", siteId: res.siteId, hard: isHard(res) }),
       onContinue: async (payload) => {
         const granted = await send({ type: "continue", siteId: res.siteId, ...payload });
@@ -163,8 +165,24 @@
         scheduleRecheck(granted?.recheckAt);
       }
     });
+  }
+
+  function showOverlay(res) {
+    removeOverlay();
+    hidePage();
+    guardOn();
+    current = res;
+    counted = false;
+    clearInterval(heartbeatTimer);
+    mountOverlay();
     if (isHard(res)) scheduleRecheck(res.until + 1000);
     else clearTimeout(recheckTimer);
+  }
+
+  function setAside() {
+    if (!overlay || isHard(current)) return;
+    overlay.destroy();
+    overlay = null;
   }
 
   function apply(res) {
@@ -182,8 +200,13 @@
       scheduleRecheck(res.recheckAt);
       return;
     }
-    if (overlay?.isAlive() && current && current.action === res.action && current.siteId === res.siteId) {
+    const same = current && current.action === res.action && current.siteId === res.siteId;
+    if (same && overlay?.isAlive()) {
       if (isHard(res)) scheduleRecheck(res.until + 1000);
+      return;
+    }
+    if (same && !overlay) {
+      mountOverlay();
       return;
     }
     showOverlay(res);
@@ -204,7 +227,8 @@
     checking = false;
     if (dead) return;
     if (!res || res.action === "error") {
-      if (!overlay) revealPage();
+      if (!current) revealPage();
+      else if (!overlay) mountOverlay();
       scheduleRecheck();
     } else {
       apply(res);
@@ -222,7 +246,13 @@
   }, 800);
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && !overlay) check();
+    if (document.visibilityState !== "visible") setAside();
+    else if (!overlay) check();
+  });
+
+  // A page Chrome loads ahead of time stays hidden until you go to it.
+  document.addEventListener("prerenderingchange", () => {
+    if (!overlay) check();
   });
 
   window.addEventListener("pageshow", (e) => {

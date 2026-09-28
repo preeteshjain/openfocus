@@ -78,7 +78,7 @@ export function modeEditor(site) {
           (v) => save(() => (site.askMaxMinutes = Number(v)), { render: false }),
           { cls: "select full", label: "Longest time you can pick" }
         ),
-        h("p", { class: "hint" }, "You slide to a time, then press Open. The slider always starts at 1 minute. When your time runs out, OpenFocus pauses you again.")
+        h("p", { class: "hint" }, "You slide to a time, then press Open. The slider always starts at 1 minute. The time is for that tab only, so a new tab asks again. When your time runs out or you close the tab, OpenFocus pauses you again.")
       );
     }
     wrap.replaceChildren(...parts);
